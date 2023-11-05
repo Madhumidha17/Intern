@@ -1,0 +1,110 @@
+index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub Repositories</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <app-root></app-root>
+  <script src="runtime.js" type="module"></script>
+  <script src="polyfills.js" type="module"></script>
+  <script src="main.js" type="module"></script>
+</body>
+</html>
+
+app.module.ts
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { SearchBarComponent } from './search-bar/search-bar.component';
+import { RepositoryListComponent } from './repository-list/repository-list.component';
+import { PaginationControlsComponent } from './pagination-controls/pagination-controls.component';
+import { FormsModule } from '@angular/forms';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    SearchBarComponent,
+    RepositoryListComponent,
+    PaginationControlsComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    FormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+app.component.ts
+
+import { Component, OnInit } from '@angular/core';
+import { GitHubService } from './services/github.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+
+  username: string = '';
+  repositories: any[] = [];
+  currentPage: number = 1;
+  perPage: number = 10;
+
+  constructor(private githubService: GitHubService) {}
+
+  ngOnInit(): void {
+    this.searchRepositories();
+  }
+
+  searchRepositories(): void {
+    this.githubService.getRepositories(this.username, this.currentPage, this.perPage)
+      .subscribe((data: any) => {
+        this.repositories = data.items;
+      });
+  }
+
+  onPageChange(pageNumber: number): void {
+    this.currentPage = pageNumber;
+    this.searchRepositories();
+  }
+
+  onPerPageChange(perPage: number): void {
+    this.perPage = perPage;
+    this.searchRepositories();
+  }
+}
+
+search-bar.component.ts
+
+import { Component, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-search-bar',
+  templateUrl: './search-bar.component.html',
+  styleUrls: ['./search-bar.component.css']
+})
+export class SearchBarComponent {
+
+  @Output() search = new EventEmitter<string>();
+
+  onSearch(username: string): void {
+    this.search.emit(username);
+  }
+}
+
+repository-list.component.ts
+
+import { Component, Input } from '@angular/core
+
+
+
